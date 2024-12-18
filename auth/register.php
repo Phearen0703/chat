@@ -1,3 +1,31 @@
+<?php
+    require("../db.connection.php");
+    session_start();
+    if(isset($_SESSION["email"])){
+        header("Location: ../index.php");
+        die();
+    }
+
+
+    // Register process
+    if($_SERVER['REQUEST_METHOD'] == "POST"){
+        $username = $_POST["username"];
+        $email = $_POST["email"];
+        $password = $_POST["password"];
+
+        $state = $conn->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
+        $state->execute([
+            ":username" => $username,
+            ":email" => $email,
+            ":password" => $password,
+        ]);
+
+        if($state->rowCount() > 0){
+            header("Location: login.php");
+            die();
+        }
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +59,7 @@
                         <label for="confirm-password">Confirm Password</label>
                         <input type="password" name="confirm-password" id="confirm-password" placeholder="Confirm Password" class="form-control">
                     </div>
-                    <p>You already have an accout? <a href="login.php">Login now!</a></p>
+                    <p>You already have an accout? <a href="/auth/login.php">Login now!</a></p>
                     <div class="d-flex justify-content-end gap-3">
                         <button class="btn btn-outline-secondary">Cancel</button>
                         <button class="btn btn-primary">Register</button>
